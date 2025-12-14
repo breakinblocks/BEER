@@ -134,6 +134,14 @@ repositories {
     // Put repositories for dependencies here
     // ForgeGradle automatically adds the Forge maven and Maven Central for you
 
+    // CurseMaven for mod dependencies
+    maven {
+        url "https://cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
+    }
+
     // If you have mod jar dependencies in ./libs, you can declare them as a repository like so.
     // See https://docs.gradle.org/current/userguide/declaring_repositories.html#sub:flat_dir_resolver
     // flatDir {
@@ -166,6 +174,11 @@ dependencies {
 
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
+    // Apotheosis for compatibility testing (v7.4.0 for 1.20.1)
+    // Dependencies: Placebo (v8.6.3), Apothic Attributes (v1.3.7)
+    runtimeOnly fg.deobf("curse.maven:placebo-283644:6274231")
+    runtimeOnly fg.deobf("curse.maven:apothic-attributes-898963:5634071")
+    runtimeOnly fg.deobf("curse.maven:apotheosis-313970:5486368")
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
