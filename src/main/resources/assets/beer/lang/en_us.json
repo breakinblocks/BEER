@@ -1,0 +1,21 @@
+{
+  "config.jade.plugin_beer.beer": "BEER",
+  "jei.beer.category.enchanting_modifiers": "Enchanting Modifiers",
+  "jei.beer.category.main_hand": "Held in Main Hand",
+  "jei.beer.category.off_hand": "Held in Off Hand",
+  "jei.beer.category.not_consumed": "Not Consumed",
+  "jei.beer.category.right_click_table": "Sneak + Right-Click Enchanting Table",
+  "jei.beer.enchanting_table.info.title": "Enchanting Table Range",
+  "jei.beer.enchanting_table.info.bookshelf_range": "By default, bookshelves can be placed up to 16 blocks away in any direction (X/Z) and up to 16 blocks vertically (Y).",
+  "jei.beer.enchanting_table.info.configuration": "The default ranges are configurable in the mod config.",
+  "jei.beer.enchanting_table.info.range_modification": "You can modify the range of a specific Enchanting Table by sneaking and right-clicking it with specific items. Check the 'Enchanting Modifiers' category for details.",
+  "jei.beer.modifier.xp_cost": "Costs %s XP",
+  "jei.beer.modifier.xp_gain": "Returns %s XP",
+  "tooltip.beer.enchanting_table.range": "Range: %sx%sx%s",
+  "beer.jei.modifier.x_width.description": "Increases/Decreases X Range",
+  "beer.jei.modifier.y_height.description": "Increases/Decreases Y Range",
+  "beer.jei.modifier.z_width.description": "Increases/Decreases Z Range",
+  "beer.message.xp_gained": "You gained %s XP",
+  "beer.message.insufficient_xp": "Insufficient XP. You need %s XP (Total: %s)",
+  "beer.message.xp_consumed": "Consumed %s XP"
+}
