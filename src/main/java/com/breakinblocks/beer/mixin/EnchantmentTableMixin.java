@@ -1,61 +1,28 @@
 package com.breakinblocks.beer.mixin;
 
-import com.breakinblocks.beer.BeerConfig;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.EnchantmentTableBlock;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.BlockHitResult;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Mutable;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
+import com.breakinblocks.beer.util.BookshelfOffsetUtil;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.util.RandomSource;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import java.util.List;
 
 @Mixin(EnchantmentTableBlock.class)
 public class EnchantmentTableMixin {
-    @Shadow @Final @Mutable
-    public static List<BlockPos> BOOKSHELF_OFFSETS;
 
-    private static int lastRangeX = -1;
-    private static int lastRangeY = -1;
-    private static int lastRangeZ = -1;
-
-    private static void updateBookshelfOffsetsFromConfig() {
-        int rangeX = BeerConfig.getRangeX();
-        int rangeY = BeerConfig.getRangeY();
-        int rangeZ = BeerConfig.getRangeZ();
-
-        // Only rebuild if config changed
-        if (rangeX == lastRangeX && rangeY == lastRangeY && rangeZ == lastRangeZ) {
-            return;
-        }
-
-        lastRangeX = rangeX;
-        lastRangeY = rangeY;
-        lastRangeZ = rangeZ;
-
-        BOOKSHELF_OFFSETS = BlockPos.betweenClosedStream(-rangeX, -rangeY, -rangeZ, rangeX, rangeY, rangeZ)
-                .filter(blockPos -> Math.abs(blockPos.getX()) > 1 || Math.abs(blockPos.getZ()) > 1)
-                .map(BlockPos::immutable)
-                .toList();
-    }
-
-    @Inject(method = "use", at = @At("HEAD"))
-    private void onUseInject(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit, CallbackInfoReturnable<InteractionResult> cir) {
-        updateBookshelfOffsetsFromConfig();
+    @Redirect(method = "animateTick", at = @At(value = "FIELD", target = "Lnet/minecraft/world/level/block/EnchantmentTableBlock;BOOKSHELF_OFFSETS:Ljava/util/List;"))
+    public List<BlockPos> beer$animateTickOffsets(BlockState state, Level level, BlockPos pos, RandomSource random) {
+        return BookshelfOffsetUtil.getOffsetsForTable(level, pos);
     }
 
     /**
      * Skip the intermediate block check for extended range bookshelves.
-     * Vanilla checks if block at (x/2, y, z/2) is air-like, which fails for distances > 2.
      * We simply check if the target position has enchant power bonus.
      */
     @Inject(method = "isValidBookShelf", at = @At("HEAD"), cancellable = true)
