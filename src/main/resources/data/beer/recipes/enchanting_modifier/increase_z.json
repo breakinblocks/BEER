@@ -1,0 +1,9 @@
+{
+  "type": "beer:enchanting_modifier",
+  "description_key": "beer.jei.modifier.z_width.description",
+  "effect_key": "+Z Width",
+  "mainhand_input": {
+    "item": "minecraft:lapis_block"
+  },
+  "modifier_type": "Z_WIDTH"
+}

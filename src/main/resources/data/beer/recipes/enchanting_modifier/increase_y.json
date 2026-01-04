@@ -1,0 +1,9 @@
+{
+  "type": "beer:enchanting_modifier",
+  "description_key": "beer.jei.modifier.y_height.description",
+  "effect_key": "+Y Height",
+  "mainhand_input": {
+    "item": "minecraft:glowstone"
+  },
+  "modifier_type": "Y_HEIGHT"
+}
