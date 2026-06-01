@@ -9,6 +9,20 @@ plugins {
 version = "${minecraft_version}-${mod_version}"
 group = mod_group_id
 
+def localEnv = [:]
+def localEnvFile = file(".env")
+if (localEnvFile.isFile()) {
+    localEnvFile.eachLine { line ->
+        def trimmed = line.trim()
+        if (!trimmed || trimmed.startsWith("#") || !trimmed.contains("=")) {
+            return
+        }
+
+        def parts = trimmed.split("=", 2)
+        localEnv[parts[0].trim()] = parts[1].trim().replaceAll(/^['"]|['"]$/, "")
+    }
+}
+
 repositories {
     mavenCentral()
     maven {
@@ -38,6 +52,10 @@ repositories {
         content {
             includeGroup "curse.maven"
         }
+    }
+    maven {
+        name = "Curios"
+        url = uri("https://maven.theillusivec4.top/")
     }
 }
 
@@ -100,11 +118,12 @@ dependencies {
     runtimeOnly("mezz.jei:jei-${jei_mc_version}-neoforge:${jeiVersion}")
 
     implementation("curse.maven:jade-324717:${jadeVersion}")
-
     compileOnly("dev.shadowsoffire:ApothicEnchanting:${apothicenchantVersion}")
     runtimeOnly("dev.shadowsoffire:Placebo:${placeboVersion}")
     runtimeOnly("dev.shadowsoffire:ApothicAttributes:${attributeslibVersion}")
     runtimeOnly("dev.shadowsoffire:ApothicEnchanting:${apothicenchantVersion}")
+    runtimeOnly "top.theillusivec4.curios:curios-neoforge:${curiosVersion}"
+    compileOnly "top.theillusivec4.curios:curios-neoforge:${curiosVersion}:api"
 }
 
 
@@ -157,10 +176,12 @@ idea {
 }
 
 // Mod publishing to CurseForge (GitHub releases handled by CI)
+def publishModVersion = mod_version.toString()
+def publishChangelogFile = file("metadata/changelogs/${mod_version}.md")
+
 publishMods {
     file = jar.archiveFile
-    def changelogFile = file("metadata/changelogs/${mod_version}.md")
-    changelog = changelogFile.exists() ? changelogFile.text : "Release ${version}"
+    changelog = publishChangelogFile.exists() ? publishChangelogFile.text.trim() : ""
     type = STABLE
     modLoaders.add("neoforge")
 
@@ -168,13 +189,34 @@ publishMods {
         projectId = "1274736"
         projectSlug = "bookshelf-extended-enchanting-reach"
         accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
+            .orElse(providers.provider { localEnv["CURSEFORGE_TOKEN"] })
         minecraftVersions.add(minecraft_version)
         optional("jei", "jade", "apothic-enchanting")
     }
 }
 
+def validatePublishChangelog = tasks.register("validatePublishChangelog") {
+    inputs.file(publishChangelogFile)
+
+    doLast {
+        if (!publishChangelogFile.isFile() || publishChangelogFile.text.trim().isEmpty()) {
+            throw new GradleException("${publishChangelogFile} is required and must not be empty before publishing to CurseForge.")
+        }
+
+        if (!publishChangelogFile.text.contains(publishModVersion)) {
+            throw new GradleException("${publishChangelogFile} must mention mod_version ${publishModVersion}.")
+        }
+    }
+}
+
+tasks.named("publishCurseforge") {
+    dependsOn validatePublishChangelog
+}
+
 // Include Maven publish when running publishMods
 tasks.named('publishMods') {
+    dependsOn validatePublishChangelog
+
     def mavenUser = providers.environmentVariable("MAVEN_USER")
     if (mavenUser.isPresent()) {
         dependsOn 'publishMavenJavaPublicationToBreakInBlocksRepository'
