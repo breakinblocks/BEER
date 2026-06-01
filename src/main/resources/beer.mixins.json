@@ -2,14 +2,12 @@
   "required": true,
   "minVersion": "0.8",
   "package": "com.breakinblocks.beer.mixin",
-  "compatibilityLevel": "JAVA_8",
-  "refmap": "beer.refmap.json",
+  "compatibilityLevel": "JAVA_25",
   "mixins": [
     "EnchantmentMenuMixin",
     "TableStatsMixin"
   ],
-  "client": [
-  ],
+  "client": [],
   "injectors": {
     "defaultRequire": 1
   }

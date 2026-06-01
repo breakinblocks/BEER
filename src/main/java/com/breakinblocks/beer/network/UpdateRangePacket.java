@@ -6,6 +6,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
@@ -73,7 +74,7 @@ public record UpdateRangePacket(BlockPos pos, int rangeX, int rangeY, int rangeZ
     private static void updateRangeData(UpdateRangePacket packet, Player player) {
         EnchantingTableDataUtil.setRanges(player.level(), packet.pos(), packet.rangeX(), packet.rangeY(), packet.rangeZ());
         
-        if (player.level() instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+        if (player.level() instanceof ServerLevel serverLevel) {
             var updatedData = EnchantingTableDataUtil.getRangeData(player.level(), packet.pos());
             SyncEnchantingDataPacket syncPacket = SyncEnchantingDataPacket.create(packet.pos(), updatedData);
             NetworkHandler.sendToPlayersNear(syncPacket, serverLevel, packet.pos(), MAX_INTERACTION_DISTANCE_SQ);

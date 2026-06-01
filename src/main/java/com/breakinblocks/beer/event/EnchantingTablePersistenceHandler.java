@@ -2,20 +2,30 @@ package com.breakinblocks.beer.event;
 
 import com.breakinblocks.beer.Config;
 import com.breakinblocks.beer.data.EnchantingTableRangeData;
-import com.breakinblocks.beer.util.EnchantingTableDataUtil;
 import com.breakinblocks.beer.network.NetworkHandler;
 import com.breakinblocks.beer.network.SyncEnchantingDataPacket;
+import com.breakinblocks.beer.util.EnchantingTableDataUtil;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.component.ItemLore;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.level.BlockEvent;
+import net.neoforged.neoforge.event.level.block.BreakBlockEvent;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @EventBusSubscriber
 public class EnchantingTablePersistenceHandler {
@@ -31,12 +41,12 @@ public class EnchantingTablePersistenceHandler {
         }
 
         BlockPos pos = event.getPos();
-        
+
         if (!event.getPlacedBlock().is(Blocks.ENCHANTING_TABLE)) {
             return;
         }
 
-        if (!(event.getEntity() instanceof net.minecraft.world.entity.player.Player player)) {
+        if (!(event.getEntity() instanceof Player player)) {
             return;
         }
 
@@ -49,31 +59,32 @@ public class EnchantingTablePersistenceHandler {
         }
 
         CustomData customData = stack.get(DataComponents.CUSTOM_DATA);
-        
-        if (customData != null) {
-            CompoundTag beerData = customData.copyTag();
-
-            if (beerData.contains("ItemModifiersX") || beerData.contains("ItemModifiersY") || beerData.contains("ItemModifiersZ")) {
-                int modX = beerData.getInt("ItemModifiersX");
-                int modY = beerData.getInt("ItemModifiersY");
-                int modZ = beerData.getInt("ItemModifiersZ");
-                
-
-                level.getServer().execute(() -> {
-                    EnchantingTableDataUtil.setRanges(level, pos, modX, modY, modZ);
-                    
-                    EnchantingTableRangeData restoredData = EnchantingTableDataUtil.getRangeData(level, pos);
-                    
-                    SyncEnchantingDataPacket syncPacket = SyncEnchantingDataPacket.create(pos, restoredData);
-                    NetworkHandler.sendToAllPlayers(syncPacket);
-                    
-                });
-            }
+        if (customData == null) {
+            return;
         }
+
+        CompoundTag beerData = customData.copyTag();
+        Optional<Integer> optX = beerData.getInt("ItemModifiersX");
+        Optional<Integer> optY = beerData.getInt("ItemModifiersY");
+        Optional<Integer> optZ = beerData.getInt("ItemModifiersZ");
+        if (optX.isEmpty() && optY.isEmpty() && optZ.isEmpty()) {
+            return;
+        }
+
+        int modX = optX.orElse(0);
+        int modY = optY.orElse(0);
+        int modZ = optZ.orElse(0);
+
+        level.getServer().execute(() -> {
+            EnchantingTableDataUtil.setRanges(level, pos, modX, modY, modZ);
+            EnchantingTableRangeData restoredData = EnchantingTableDataUtil.getRangeData(level, pos);
+            SyncEnchantingDataPacket syncPacket = SyncEnchantingDataPacket.create(pos, restoredData);
+            NetworkHandler.sendToAllPlayers(syncPacket);
+        });
     }
 
     @SubscribeEvent
-    public static void onBlockBreak(BlockEvent.BreakEvent event) {
+    public static void onBlockBreak(BreakBlockEvent event) {
         if (!Config.enableItemModifiers) {
             return;
         }
@@ -81,9 +92,9 @@ public class EnchantingTablePersistenceHandler {
         if (!(event.getLevel() instanceof ServerLevel level)) {
             return;
         }
-        
+
         BlockPos pos = event.getPos();
-        
+
         if (!event.getState().is(Blocks.ENCHANTING_TABLE)) {
             return;
         }
@@ -91,64 +102,51 @@ public class EnchantingTablePersistenceHandler {
         if (event.getPlayer().getAbilities().instabuild) {
             return;
         }
-        EnchantingTableRangeData data = EnchantingTableDataUtil.getRangeData(level, pos);
 
+        EnchantingTableRangeData data = EnchantingTableDataUtil.getRangeData(level, pos);
         if (!data.hasItemModifications()) {
             return;
         }
 
-
         event.setCanceled(true);
-
         level.removeBlock(pos, false);
 
         ItemStack enchantingTableStack = new ItemStack(Blocks.ENCHANTING_TABLE);
-        
+
         CompoundTag beerData = new CompoundTag();
         beerData.putInt("ItemModifiersX", data.getItemModifiersX());
         beerData.putInt("ItemModifiersY", data.getItemModifiersY());
         beerData.putInt("ItemModifiersZ", data.getItemModifiersZ());
-        
-        CustomData customData = CustomData.of(beerData);
-        enchantingTableStack.set(DataComponents.CUSTOM_DATA, customData);
-        
-        java.util.List<net.minecraft.network.chat.Component> lore = new java.util.ArrayList<>();
-        
-        lore.add(net.minecraft.network.chat.Component.literal("Bookshelf Range Modifiers:")
-                .withStyle(net.minecraft.ChatFormatting.GRAY));
-        
-        var modifierLine = net.minecraft.network.chat.Component.empty();
+        enchantingTableStack.set(DataComponents.CUSTOM_DATA, CustomData.of(beerData));
+
+        List<Component> lore = new ArrayList<>();
+        lore.add(Component.literal("Bookshelf Range Modifiers:").withStyle(ChatFormatting.GRAY));
+
+        MutableComponent modifierLine = Component.empty();
         boolean hasModifiers = false;
-        
         if (data.getItemModifiersX() != 0) {
-            if (hasModifiers) modifierLine = modifierLine.append(" ");
-            modifierLine = modifierLine.append(net.minecraft.network.chat.Component.literal("X: " + (data.getItemModifiersX() > 0 ? "+" : "") + data.getItemModifiersX())
-                    .withStyle(net.minecraft.ChatFormatting.RED));
+            modifierLine = modifierLine.append(Component.literal("X: " + (data.getItemModifiersX() > 0 ? "+" : "") + data.getItemModifiersX())
+                    .withStyle(ChatFormatting.RED));
             hasModifiers = true;
         }
         if (data.getItemModifiersY() != 0) {
-            if (hasModifiers) modifierLine = modifierLine.append(" ");
-            modifierLine = modifierLine.append(net.minecraft.network.chat.Component.literal("Y: " + (data.getItemModifiersY() > 0 ? "+" : "") + data.getItemModifiersY())
-                    .withStyle(net.minecraft.ChatFormatting.GREEN));
+            if (hasModifiers) modifierLine = modifierLine.append(Component.literal(" "));
+            modifierLine = modifierLine.append(Component.literal("Y: " + (data.getItemModifiersY() > 0 ? "+" : "") + data.getItemModifiersY())
+                    .withStyle(ChatFormatting.GREEN));
             hasModifiers = true;
         }
         if (data.getItemModifiersZ() != 0) {
-            if (hasModifiers) modifierLine = modifierLine.append(" ");
-            modifierLine = modifierLine.append(net.minecraft.network.chat.Component.literal("Z: " + (data.getItemModifiersZ() > 0 ? "+" : "") + data.getItemModifiersZ())
-                    .withStyle(net.minecraft.ChatFormatting.BLUE));
+            if (hasModifiers) modifierLine = modifierLine.append(Component.literal(" "));
+            modifierLine = modifierLine.append(Component.literal("Z: " + (data.getItemModifiersZ() > 0 ? "+" : "") + data.getItemModifiersZ())
+                    .withStyle(ChatFormatting.BLUE));
         }
-        
         lore.add(modifierLine);
-        
-        enchantingTableStack.set(DataComponents.LORE, new net.minecraft.world.item.component.ItemLore(lore));
-
+        enchantingTableStack.set(DataComponents.LORE, new ItemLore(lore));
 
         double x = pos.getX() + 0.5;
-        double y = pos.getY() + 0.5; 
+        double y = pos.getY() + 0.5;
         double z = pos.getZ() + 0.5;
-        ItemEntity itemEntity = new ItemEntity(level, x, y, z, enchantingTableStack);
-        level.addFreshEntity(itemEntity);
-
+        level.addFreshEntity(new ItemEntity(level, x, y, z, enchantingTableStack));
 
         event.getState().getBlock().popExperience(level, pos, 0);
     }

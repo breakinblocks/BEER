@@ -8,7 +8,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.EnchantingTableBlockEntity;
 
 public class EnchantingTableDataUtil {
-    
+
     public static EnchantingTableRangeData getRangeData(Level level, BlockPos pos) {
         BlockEntity blockEntity = level.getBlockEntity(pos);
         if (blockEntity instanceof EnchantingTableBlockEntity enchantingTable) {
@@ -17,8 +17,7 @@ public class EnchantingTableDataUtil {
                 return data;
             }
         }
-        EnchantingTableRangeData newData = new EnchantingTableRangeData();
-        return newData;
+        return new EnchantingTableRangeData();
     }
 
     public static void setRangeData(Level level, BlockPos pos, EnchantingTableRangeData data) {
@@ -41,14 +40,12 @@ public class EnchantingTableDataUtil {
         BlockEntity blockEntity = level.getBlockEntity(pos);
         return blockEntity instanceof EnchantingTableBlockEntity;
     }
+
     public static int[] getEffectiveBoundingBoxSizes(Level level, BlockPos pos) {
         EnchantingTableRangeData data = getRangeData(level, pos);
-        // Convert radius to actual bounding box dimensions
-        // X and Z: range 0 = no bookshelf area (1x1), range 1 = -1 to +1 (3x3), range 2 = -2 to +2 (5x5)
-        // Y: range 0 = only Y=0 (height 1), range 1 = Y=0,1 (height 2)
         return new int[]{
-            Math.max(1, data.getEffectiveRangeX() * 2 + 1), 
-            Math.max(1, data.getEffectiveRangeY() + 1), 
+            Math.max(1, data.getEffectiveRangeX() * 2 + 1),
+            Math.max(1, data.getEffectiveRangeY() + 1),
             Math.max(1, data.getEffectiveRangeZ() * 2 + 1)
         };
     }
@@ -58,10 +55,8 @@ public class EnchantingTableDataUtil {
         data.resetToDefaults();
         setRangeData(level, pos, data);
     }
-    
+
     public static void forceResetAll(Level level, BlockPos pos) {
-        // Force create completely new data with defaults
-        EnchantingTableRangeData data = new EnchantingTableRangeData();
-        setRangeData(level, pos, data);
+        setRangeData(level, pos, new EnchantingTableRangeData());
     }
 }

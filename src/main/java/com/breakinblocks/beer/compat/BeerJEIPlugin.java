@@ -1,7 +1,6 @@
 package com.breakinblocks.beer.compat;
 
 import com.breakinblocks.beer.Config;
-import com.breakinblocks.beer.recipe.BeerRecipes;
 import com.breakinblocks.beer.recipe.EnchantingModifierRecipeType;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
@@ -9,28 +8,22 @@ import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Blocks;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import org.slf4j.Logger;
-import com.mojang.logging.LogUtils;
+import java.util.Optional;
 
 @JeiPlugin
 public class BeerJEIPlugin implements IModPlugin {
-    private static final Logger LOGGER = LogUtils.getLogger();
 
     @Override
-    public ResourceLocation getPluginUid() {
-        return ResourceLocation.fromNamespaceAndPath("beer", "enchanting_modifiers");
+    public Identifier getPluginUid() {
+        return Identifier.fromNamespaceAndPath("beer", "enchanting_modifiers");
     }
 
     @Override
@@ -44,27 +37,33 @@ public class BeerJEIPlugin implements IModPlugin {
             return;
         }
 
-        List<EnchantingModifierRecipeType> jeiRecipes = new ArrayList<>();
-        
-        try {
-            if (Minecraft.getInstance().level != null) {
-                var recipeManager = Minecraft.getInstance().level.getRecipeManager();
-                var recipeType = BeerRecipes.ENCHANTING_MODIFIER_TYPE.get();
-                
-                if (recipeManager != null && recipeType != null) {
-                    var allRecipes = recipeManager.getAllRecipesFor(recipeType);
-                    
-                    jeiRecipes = allRecipes
-                        .stream()
-                        .sorted((r1, r2) -> r1.id().compareNamespaced(r2.id()))
-                        .map(recipeHolder -> recipeHolder.value())
-                        .collect(Collectors.toList());
-                }
-            }
-        } catch (Exception e) {
-            LOGGER.error("[BEER JEI] Failed to load datapack recipes", e);
-        }
-        
+        List<EnchantingModifierRecipeType> jeiRecipes = List.of(
+            new EnchantingModifierRecipeType(
+                Ingredient.of(Items.REDSTONE_BLOCK), Optional.empty(), false,
+                "+X Width", "beer.jei.modifier.x_width.description",
+                EnchantingModifierRecipe.ModifierType.X_WIDTH),
+            new EnchantingModifierRecipeType(
+                Ingredient.of(Items.REDSTONE_BLOCK), Optional.of(Ingredient.of(Items.QUARTZ)), false,
+                "-X Width", "beer.jei.modifier.x_width.description",
+                EnchantingModifierRecipe.ModifierType.X_WIDTH),
+            new EnchantingModifierRecipeType(
+                Ingredient.of(Items.GLOWSTONE), Optional.empty(), false,
+                "+Y Height", "beer.jei.modifier.y_height.description",
+                EnchantingModifierRecipe.ModifierType.Y_HEIGHT),
+            new EnchantingModifierRecipeType(
+                Ingredient.of(Items.GLOWSTONE), Optional.of(Ingredient.of(Items.QUARTZ)), false,
+                "-Y Height", "beer.jei.modifier.y_height.description",
+                EnchantingModifierRecipe.ModifierType.Y_HEIGHT),
+            new EnchantingModifierRecipeType(
+                Ingredient.of(Items.LAPIS_BLOCK), Optional.empty(), false,
+                "+Z Width", "beer.jei.modifier.z_width.description",
+                EnchantingModifierRecipe.ModifierType.Z_WIDTH),
+            new EnchantingModifierRecipeType(
+                Ingredient.of(Items.LAPIS_BLOCK), Optional.of(Ingredient.of(Items.QUARTZ)), false,
+                "-Z Width", "beer.jei.modifier.z_width.description",
+                EnchantingModifierRecipe.ModifierType.Z_WIDTH)
+        );
+
         registration.addRecipes(EnchantingTableCategory.TYPE, jeiRecipes);
 
         registration.addItemStackInfo(
@@ -78,8 +77,6 @@ public class BeerJEIPlugin implements IModPlugin {
 
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-        registration.addRecipeCatalyst(new ItemStack(Blocks.ENCHANTING_TABLE), EnchantingTableCategory.TYPE);
+        registration.addCraftingStation(EnchantingTableCategory.TYPE, new ItemStack(Blocks.ENCHANTING_TABLE));
     }
-
-
 }

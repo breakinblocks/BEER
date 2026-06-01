@@ -5,7 +5,7 @@ import com.breakinblocks.beer.network.NetworkHandler;
 import com.breakinblocks.beer.network.RequestEnchantingDataPacket;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -55,8 +55,8 @@ public class BeerJadePlugin implements IWailaPlugin, IBlockComponentProvider {
     }
 
     @Override
-    public ResourceLocation getUid() {
-        return ResourceLocation.fromNamespaceAndPath("beer", "beer");
+    public Identifier getUid() {
+        return Identifier.fromNamespaceAndPath("beer", "beer");
     }
     
     public static void clearPendingRequest(BlockPos pos) {

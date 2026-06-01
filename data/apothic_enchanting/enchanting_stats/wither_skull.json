@@ -1,0 +1,11 @@
+{
+    "type": "apothic_enchanting:enchanting_stats",
+    "blocks": [
+        "minecraft:wither_skeleton_skull",
+        "minecraft:wither_skeleton_wall_skull"
+    ],
+    "stats": {
+        "maxEterna": 0.0,
+        "quanta": 10.0
+    }
+}

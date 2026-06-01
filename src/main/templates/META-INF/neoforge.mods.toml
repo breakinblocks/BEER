@@ -76,21 +76,21 @@ side = "BOTH"
 [[dependencies."${mod_id}"]]
 modId = "apothic_enchanting"
 type = "optional"
-versionRange = "[1.5.0,)"
+versionRange = "[4.0.0-beta1,)"
 ordering = "AFTER"
 side = "BOTH"
 
 [[dependencies."${mod_id}"]]
 modId = "jade"
 type = "optional"
-versionRange = "[15.10.0,)"
+versionRange = "[0.0.0,)"
 ordering = "AFTER"
 side = "BOTH"
 
 [[dependencies."${mod_id}"]]
 modId = "jei"
 type = "optional"
-versionRange = "[19.20.0,)"
+versionRange = "[29.0.0,)"
 ordering = "AFTER"
 side = "BOTH"
 

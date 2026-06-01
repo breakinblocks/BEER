@@ -39,13 +39,11 @@ public record RequestEnchantingDataPacket(BlockPos pos) implements CustomPacketP
     public static void handle(RequestEnchantingDataPacket packet, IPayloadContext context) {
         context.enqueueWork(() -> {
             if (context.player() instanceof ServerPlayer serverPlayer) {
-                ServerLevel level = serverPlayer.serverLevel();
+                ServerLevel level = serverPlayer.level();
                 var blockEntity = level.getBlockEntity(packet.pos());
                 
                 if (blockEntity instanceof EnchantingTableBlockEntity) {
                     EnchantingTableRangeData data = EnchantingTableDataUtil.getRangeData(level, packet.pos());
-                    
-                    // Send the data back to the requesting player
                     SyncEnchantingDataPacket syncPacket = SyncEnchantingDataPacket.create(packet.pos(), data);
                     NetworkHandler.sendToPlayer(syncPacket, serverPlayer);
                 }
