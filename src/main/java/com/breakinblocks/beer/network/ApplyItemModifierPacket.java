@@ -7,6 +7,8 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
 import net.minecraft.util.ByIdMap;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
@@ -58,14 +60,18 @@ public record ApplyItemModifierPacket(
 
     public static void handle(ApplyItemModifierPacket packet, IPayloadContext context) {
         context.enqueueWork(() -> {
-            Level level = context.player().level();
+            Player player = context.player();
+            Level level = player.level();
             if (level.isClientSide()) {
-                handleClient(packet, level);
+                handleClient(packet, player);
             }
         });
     }
 
-    private static void handleClient(ApplyItemModifierPacket packet, Level level) {
+    private static void handleClient(ApplyItemModifierPacket packet, Player player) {
+        if (packet.success()) {
+            player.swing(InteractionHand.MAIN_HAND);
+        }
     }
 
 

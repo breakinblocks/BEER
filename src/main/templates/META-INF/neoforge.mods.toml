@@ -76,7 +76,7 @@ side = "BOTH"
 [[dependencies."${mod_id}"]]
 modId = "apothic_enchanting"
 type = "optional"
-versionRange = "[1.5.0,)"
+versionRange = "[1.6.1,)"
 ordering = "AFTER"
 side = "BOTH"
 

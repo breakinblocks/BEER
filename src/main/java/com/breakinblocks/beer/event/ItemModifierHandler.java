@@ -71,10 +71,6 @@ public class ItemModifierHandler {
     }
     
     private static ModifierType getModifierType(Level level, ItemStack mainhandStack, ItemStack offhandStack) {
-        if (level.isClientSide()) {
-            return null; // Don't process on client side
-        }
-        
         try {
             var recipeManager = level.getRecipeManager();
             var recipeType = BeerRecipes.ENCHANTING_MODIFIER_TYPE.get();
@@ -108,10 +104,6 @@ public class ItemModifierHandler {
     }
     
     private static boolean isDecreaseMode(Level level, ItemStack mainhandStack, ItemStack offhandStack) {
-        if (level.isClientSide()) {
-            return false;
-        }
-        
         try {
             var recipeManager = level.getRecipeManager();
             var recipeType = BeerRecipes.ENCHANTING_MODIFIER_TYPE.get();

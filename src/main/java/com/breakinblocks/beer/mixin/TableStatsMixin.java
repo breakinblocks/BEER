@@ -30,8 +30,8 @@ public abstract class TableStatsMixin {
      * @reason Use custom bookshelf offsets from BookshelfOffsetUtil instead of default EnchantingTableBlock.BOOKSHELF_OFFSETS
      */
     @Overwrite
-    public static EnchantmentTableStats gatherStats(LevelReader level, BlockPos pos, int itemEnch) {
-        EnchantmentTableStats.Builder builder = new EnchantmentTableStats.Builder(itemEnch);
+    public static EnchantmentTableStats gatherStats(LevelReader level, BlockPos pos) {
+        EnchantmentTableStats.Builder builder = new EnchantmentTableStats.Builder();
 
         if (level instanceof Level worldLevel) {
             for (BlockPos offset : BookshelfOffsetUtil.getOffsetsForTable(worldLevel, pos)) {
