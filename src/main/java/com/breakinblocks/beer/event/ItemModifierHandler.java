@@ -1,5 +1,6 @@
 package com.breakinblocks.beer.event;
 
+import com.breakinblocks.beer.Beer;
 import com.breakinblocks.beer.Config;
 import com.breakinblocks.beer.data.BeerDataAttachments;
 import com.breakinblocks.beer.data.EnchantingTableRangeData;
@@ -7,7 +8,6 @@ import com.breakinblocks.beer.network.ApplyItemModifierPacket;
 import com.breakinblocks.beer.network.NetworkHandler;
 import com.breakinblocks.beer.network.SyncEnchantingDataPacket;
 import com.breakinblocks.beer.recipe.BeerRecipes;
-import com.breakinblocks.beer.recipe.EnchantingModifierRecipeType;
 import com.breakinblocks.beer.compat.EnchantingModifierRecipe;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -17,9 +17,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.EnchantingTableBlockEntity;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -48,7 +46,7 @@ public class ItemModifierHandler {
             return;
         }
         
-        if (!level.getBlockState(pos).is(Blocks.ENCHANTING_TABLE)) {
+        if (!level.getBlockState(pos).is(Beer.ENCHANTING_TABLES_BLOCK_TAG)) {
             return;
         }
         

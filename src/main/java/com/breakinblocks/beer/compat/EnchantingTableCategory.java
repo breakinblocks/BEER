@@ -1,5 +1,6 @@
 package com.breakinblocks.beer.compat;
 
+import com.breakinblocks.beer.Beer;
 import com.breakinblocks.beer.Config;
 import com.breakinblocks.beer.recipe.EnchantingModifierRecipeType;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
@@ -78,12 +79,12 @@ public class EnchantingTableCategory implements IRecipeCategory<EnchantingModifi
             builder.addSlot(RecipeIngredientRole.INPUT, 11, 48)
                    .addIngredients(recipe.getOffhandInput());
         }
-
+        List<ItemStack> catalysts = Beer.getEnchantingTablesBlockTag();
         builder.addInvisibleIngredients(RecipeIngredientRole.CATALYST)
-               .addItemStack(new ItemStack(Blocks.ENCHANTING_TABLE));
+               .addItemStacks(catalysts);
                
         builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT)
-               .addItemStack(new ItemStack(Blocks.ENCHANTING_TABLE));
+               .addItemStacks(catalysts);
     }
 
     @Override
