@@ -1,5 +1,6 @@
 package com.breakinblocks.beer.event;
 
+import com.breakinblocks.beer.Beer;
 import com.breakinblocks.beer.Config;
 import com.breakinblocks.beer.data.EnchantingTableRangeData;
 import com.breakinblocks.beer.util.EnchantingTableDataUtil;
@@ -32,7 +33,7 @@ public class EnchantingTablePersistenceHandler {
 
         BlockPos pos = event.getPos();
         
-        if (!event.getPlacedBlock().is(Blocks.ENCHANTING_TABLE)) {
+        if (!event.getPlacedBlock().is(Beer.ENCHANTING_TABLES_BLOCK_TAG)) {
             return;
         }
 
@@ -41,9 +42,9 @@ public class EnchantingTablePersistenceHandler {
         }
 
         ItemStack stack = player.getMainHandItem();
-        if (!stack.is(Blocks.ENCHANTING_TABLE.asItem())) {
+        if (!stack.is(Beer.ENCHANTING_TABLES_ITEM_TAG)) {
             stack = player.getOffhandItem();
-            if (!stack.is(Blocks.ENCHANTING_TABLE.asItem())) {
+            if (!stack.is(Beer.ENCHANTING_TABLES_ITEM_TAG)) {
                 return;
             }
         }
@@ -84,7 +85,7 @@ public class EnchantingTablePersistenceHandler {
         
         BlockPos pos = event.getPos();
         
-        if (!event.getState().is(Blocks.ENCHANTING_TABLE)) {
+        if (!event.getState().is(Beer.ENCHANTING_TABLES_BLOCK_TAG)) {
             return;
         }
 
@@ -100,10 +101,14 @@ public class EnchantingTablePersistenceHandler {
 
         event.setCanceled(true);
 
+        ItemStack enchantingTableStack = new ItemStack(event.getState().getBlock());
+
+        if (enchantingTableStack.isEmpty()) {
+            return;
+        }
+
         level.removeBlock(pos, false);
 
-        ItemStack enchantingTableStack = new ItemStack(Blocks.ENCHANTING_TABLE);
-        
         CompoundTag beerData = new CompoundTag();
         beerData.putInt("ItemModifiersX", data.getItemModifiersX());
         beerData.putInt("ItemModifiersY", data.getItemModifiersY());

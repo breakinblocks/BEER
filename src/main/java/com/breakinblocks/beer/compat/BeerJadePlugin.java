@@ -1,5 +1,6 @@
 package com.breakinblocks.beer.compat;
 
+import com.breakinblocks.beer.Beer;
 import com.breakinblocks.beer.util.EnchantingTableDataUtil;
 import com.breakinblocks.beer.network.NetworkHandler;
 import com.breakinblocks.beer.network.RequestEnchantingDataPacket;
@@ -8,7 +9,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import snownee.jade.api.*;
 import snownee.jade.api.config.IPluginConfig;
 
@@ -27,7 +27,7 @@ public class BeerJadePlugin implements IWailaPlugin, IBlockComponentProvider {
 
     @Override
     public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
-        if (accessor.getBlock() == Blocks.ENCHANTING_TABLE) {
+        if (accessor.getBlockState().is(Beer.ENCHANTING_TABLES_BLOCK_TAG)) {
             try {
                 var data = EnchantingTableDataUtil.getRangeData(accessor.getLevel(), accessor.getPosition());
                 

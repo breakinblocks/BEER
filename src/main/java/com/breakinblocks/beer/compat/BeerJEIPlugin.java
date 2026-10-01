@@ -1,5 +1,6 @@
 package com.breakinblocks.beer.compat;
 
+import com.breakinblocks.beer.Beer;
 import com.breakinblocks.beer.Config;
 import com.breakinblocks.beer.recipe.BeerRecipes;
 import com.breakinblocks.beer.recipe.EnchantingModifierRecipeType;
@@ -13,8 +14,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Blocks;
 
 import java.util.ArrayList;
@@ -78,8 +77,9 @@ public class BeerJEIPlugin implements IModPlugin {
 
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-        registration.addRecipeCatalyst(new ItemStack(Blocks.ENCHANTING_TABLE), EnchantingTableCategory.TYPE);
+        List<ItemStack> enchantingTables = Beer.getEnchantingTablesBlockTag();
+        for (ItemStack tableStack : enchantingTables) {
+            registration.addRecipeCatalyst(tableStack, EnchantingTableCategory.TYPE);
+        }
     }
-
-
 }
