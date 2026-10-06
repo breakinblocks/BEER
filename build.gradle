@@ -118,10 +118,11 @@ dependencies {
     runtimeOnly("mezz.jei:jei-${jei_mc_version}-neoforge:${jeiVersion}")
 
     implementation("curse.maven:jade-324717:${jadeVersion}")
-    compileOnly("dev.shadowsoffire:ApothicEnchanting:${apothicenchantVersion}")
-    runtimeOnly("dev.shadowsoffire:Placebo:${placeboVersion}")
-    runtimeOnly("dev.shadowsoffire:ApothicAttributes:${attributeslibVersion}")
-    runtimeOnly("dev.shadowsoffire:ApothicEnchanting:${apothicenchantVersion}")
+
+    compileOnly("dev.shadowsoffire:ApothicEnchanting:${apothicenchantVersion}") { transitive = false }
+    runtimeOnly("dev.shadowsoffire:Placebo:${placeboVersion}") { transitive = false }
+    runtimeOnly("dev.shadowsoffire:ApothicAttributes:${attributeslibVersion}") { transitive = false }
+    runtimeOnly("dev.shadowsoffire:ApothicEnchanting:${apothicenchantVersion}") { transitive = false }
     runtimeOnly "top.theillusivec4.curios:curios-neoforge:${curiosVersion}"
     compileOnly "top.theillusivec4.curios:curios-neoforge:${curiosVersion}:api"
 }
@@ -191,6 +192,8 @@ publishMods {
         accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
             .orElse(providers.provider { localEnv["CURSEFORGE_TOKEN"] })
         minecraftVersions.add(minecraft_version)
+        clientRequired = true
+        serverRequired = true
         optional("jei", "jade", "apothic-enchanting")
     }
 }

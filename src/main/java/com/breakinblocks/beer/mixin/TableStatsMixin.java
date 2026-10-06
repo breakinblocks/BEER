@@ -28,13 +28,13 @@ public abstract class TableStatsMixin {
     }
 
     @Inject(
-        method = "gatherStats(Lnet/minecraft/world/level/LevelReader;Lnet/minecraft/core/BlockPos;I)Ldev/shadowsoffire/apothic_enchanting/table/EnchantmentTableStats;",
+        method = "gatherStats(Lnet/minecraft/world/level/LevelReader;Lnet/minecraft/core/BlockPos;)Ldev/shadowsoffire/apothic_enchanting/table/EnchantmentTableStats;",
         at = @At("HEAD"),
         cancellable = true,
         remap = false
     )
-    private static void beer$useCustomOffsets(LevelReader level, BlockPos pos, int itemEnch, CallbackInfoReturnable<EnchantmentTableStats> cir) {
-        EnchantmentTableStats.Builder builder = new EnchantmentTableStats.Builder(itemEnch);
+    private static void beer$useCustomOffsets(LevelReader level, BlockPos pos, CallbackInfoReturnable<EnchantmentTableStats> cir) {
+        EnchantmentTableStats.Builder builder = new EnchantmentTableStats.Builder();
         Iterable<BlockPos> offsets = level instanceof Level worldLevel
             ? BookshelfOffsetUtil.getOffsetsForTable(worldLevel, pos)
             : EnchantingTableBlock.BOOKSHELF_OFFSETS;
